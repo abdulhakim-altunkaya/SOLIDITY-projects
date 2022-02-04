@@ -13,8 +13,8 @@ contract Heritance {
     }
 
     function withdraw() external {
-        require(block.timestamp > maturity, "still there is time")
-        require(msg.sender == kid, "you are not my child");
+        require(block.timestamp > releaseDate, "time is not filled yet");
+        require(msg.sender == myKidAccount, "only kid can withdraw");
         payable(msg.sender).transfer(address(this).balance);
     }
 }
