@@ -23,10 +23,11 @@ contract Heritance {
     }
 
     function withdraw() external {
-        require(timeLeft[msg.sender] <= block.timestamp, "you arent mature yet");
-        require(amounts[msg.sender] > 0, "only kid can withdraw");
-        require(paid[msg.sender] == false, "dont steal");
-        paid[msg.sender] = true;
-        payable(msg.sender).transfer(amounts[msg.sender]);
+        Kİd storage kid = kids[msg.sender];
+        require(kid.maturity <= block.timestamp, "you arent mature yet");
+        require(kid.amount > 0, "only kid can withdraw");
+        require(kid.paid == false, "dont steal");
+        kid.paid = true;
+        payable(msg.sender).transfer(kid.amount);
     }
 }
