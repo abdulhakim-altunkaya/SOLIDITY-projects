@@ -1,7 +1,7 @@
 pragma solidity >=0.8.7;
 
 //In this contract we are assuming that there are many kids
-// instead of one
+// instead of one. Each can withdraw only once. Only parents can add kids.
 contract Heritance {
     struct Kid {
         uint amount;
@@ -23,7 +23,7 @@ contract Heritance {
     }
 
     function withdraw() external {
-        Kİd storage kid = kids[msg.sender];
+        Kid storage kid = kids[msg.sender];
         require(kid.maturity <= block.timestamp, "you arent mature yet");
         require(kid.amount > 0, "only kid can withdraw");
         require(kid.paid == false, "dont steal");
