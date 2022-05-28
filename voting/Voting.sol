@@ -15,7 +15,7 @@ contract Voting {
 
     address[] internal votedAddresses;
     string[] internal proposals;
-    string public currentProposal;
+    string internal currentProposal;
     string[] internal passedProposals;
 
     //this part is for future voting count and voting result functions.

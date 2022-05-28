@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+    <style>
+        body {
+            background-color: palevioletred;
+        }
+        button {
+            background-color: aquamarine;
+            font-family: impact;
+            font-size: 25px;
+            padding: 5px;
+        }
+        #mainArea {
+            display: flex;
+            flex-direction: row;
+        }
+        #readArea {
+            flex-basis: 50%;
+        }
+        #writeArea {
+            flex-basis: 50%;
+        }
+        input{
+            border-radius: 4px;
+            height: 20px;
+            width: 90%;
+            border: solid 2px antiquewhite;
+        }
+    </style>
+    <title>VOTING CONTRACT</title>
+</head>
+<body>
+    <div id="mainArea">
+        <div id="readArea">
+            <button onclick="connectMetamask()">CONNECT METAMASK</button> 
+            <p id="accountArea">Your Account:</p>
+            <button onclick="connectContract()">CONNECT TO VOTING SYSTEM</button>
+            <p id="statusArea">Status: Not Connected to the System</p>
+            <button onclick="getOwner()">SEE THE MANAGER</button>
+            <p id="ownerArea">Manager:</p>
+            <button onclick="getCurrentProposal()">SEE CURRENT PROPOSAL</button>
+            <p id="currentProposalArea">Current Proposal:</p>
+            <button onclick="getSpecificProposal()">SEE A SPECIFIC PROPOSAL PROPOSAL</button> <br> <br>
+            <input type="number" name="proposalIndex" id="proposalIndex">
+            <p id="specificProposalArea">The Proposal You Searched:</p>
+            <button onclick="seeAllProposals()">SEE ALL PROPOSALS</button>
+            <p id="allProposalsArea">All Proposals:</p>
+        </div>
+        <div id="writeArea">
+            <button onclick="addProposal()">ADD PROPOSAL</button> <br> <br>
+            <input type="text" name="proposalArea" id="proposalArea" autofocus> <br> <br>
+            <button onclick="setCurrentProposal()">SET CURRENT PROPOSAL</button><br> <br>
+            <input type="number" name="setCurrentProposal" id="setCurrentProposal"> <br><br>
+            <button onclick="closeCurrentProposal()">CLOSE CURRENT PROPOSAL</button><br> <br>
+            <button onclick="getPastProposals()">SEE PAST PROPOSALS</button>
+            <p id="allPastProposalsArea">All Past Proposals:</p>
+        </div>
+    </div>
+
+
+    <script>
+        let account;
+        const connectMetamask = async () => {
+            if(window.ethereum !== "undefined") {
+                const accounts = await ethereum.request({ method: "eth_requestAccounts"});
+                account = accounts[0];
+                document.getElementById("accountArea").innerHTML = `Your Account: ${account}`;
+            }
+        }
+
+        const connectContract = async () => {
+            const ABI = [
+                {
+                    "inputs": [],
+                    "name": "closeVoting",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "_number",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "selectProposals",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "string",
+                            "name": "_proposal",
+                            "type": "string"
+                        }
+                    ],
+                    "name": "submitProposals",
+                    "outputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "stateMutability": "nonpayable",
+                    "type": "constructor"
+                },
+                {
+                    "inputs": [],
+                    "name": "getPassedProposals",
+                    "outputs": [
+                        {
+                            "internalType": "string[]",
+                            "name": "",
+                            "type": "string[]"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "getProposals",
+                    "outputs": [
+                        {
+                            "internalType": "string[]",
+                            "name": "",
+                            "type": "string[]"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "owner",
+                    "outputs": [
+                        {
+                            "internalType": "address",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "seeMainProposal",
+                    "outputs": [
+                        {
+                            "internalType": "string",
+                            "name": "",
+                            "type": "string"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "_number",
+                            "type": "uint256"
+                        }
+                    ],
+                    "name": "seeProposals",
+                    "outputs": [
+                        {
+                            "internalType": "string",
+                            "name": "",
+                            "type": "string"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                }
+            ];
+            const Address = "0x7604D3c70492caAe9936f2303D18875D389dC0b8";
+            window.web3 = await new Web3(window.ethereum);
+            window.contract = await new window.web3.eth.Contract(ABI, Address);
+            document.getElementById("statusArea").innerHTML = "Connected to Voting System";
+        }
+        const getOwner = async () => {
+            const data = await window.contract.methods.owner().call();
+            document.getElementById("ownerArea").innerHTML = `Manager: ${data}`;
+        }
+        const getCurrentProposal = async () => {
+            const data = await window.contract.methods.seeMainProposal().call();
+            document.getElementById("currentProposalArea").innerHTML = `Current Proposal: ${data}`;
+        }
+        const getSpecificProposal = async () => {
+            const index = document.getElementById("proposalIndex").value;
+            const data = await window.contract.methods.seeProposals(index).call();
+            document.getElementById("specificProposalArea").innerHTML = `The Proposal You Searched: ${data}`;
+        }
+        const seeAllProposals = async () => {
+            document.getElementById("allProposalsArea").innerHTML = "All Proposals:";
+            const data = await window.contract.methods.getProposals().call();
+            for(let i = 0; i<data.length; i++) {
+                document.getElementById("allProposalsArea").innerHTML += `<p>${data[i]}</p>`;
+            }
+        }
+        const getPastProposals = async () => {
+            const data = await window.contract.methods.getPassedProposals().call();
+            document.getElementById("allPastProposalsArea").innerHTML = "All Past Proposals:";
+            for(let i = 0; i<data.length; i++){
+                document.getElementById("allPastProposalsArea").innerHTML += `<p> ${data[i]} </p>`;
+            }
+        }
+
+
+        const addProposal = async () => {
+            const data = document.getElementById("proposalArea").value;
+            await window.contract.methods.submitProposals(data).send({ from: account });
+        }
+        const setCurrentProposal = async () => {
+            const data = document.getElementById("setCurrentProposal").value;
+            await window.contract.methods.selectProposals(data).send({ from: account });
+        }
+        const closeCurrentProposal = async () => {
+            await window.contract.methods.closeVoting().send({ from: account});
+            document.getElementById("currentProposalArea").innerHTML = "Current Proposal:";
+        }
+
+
+
+    </script>
+</body>
+</html>
+
