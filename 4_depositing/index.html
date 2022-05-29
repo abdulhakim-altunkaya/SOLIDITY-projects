@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
+    <title>DEPOSITING CONTRACT</title>
+    <style>
+        body {
+            background-color: palevioletred;
+            font-size: 33px;
+        }
+        button {
+            font: impact;
+            padding: 5px;
+            background-color: aquamarine;
+            font-size: 33px;
+        }
+        input {
+            border: 2px, dashed, black;
+            height: 35px;
+            font-size: 33px;
+            width: 15vw;
+            padding: 6px;
+            outline: none;
+        }
+    </style>
+
+</head>
+<body>
+    <button onclick="connectMetamask()">CONNECT METAMASK</button>
+    <p id="accountArea">Account: Not Connected to Metamask</p>
+    <button onclick="connectContract()">CONNECT CONTRACT</button>
+    <p id="contractArea">Contract Connection: FALSE</p>
+    <button onclick="readFromContract()">READ FROM CONTRACT</button>
+    <p id="dataArea">Word from Contract: NOT CONNECTED TO CONTRACT</p>
+    <button onclick="getBalanceContract()">BALANCE OF THE CONTRACT</button>
+    <p id="balanceArea">Balance of the Contract: Unknown</p>
+    <button onclick="sendEther()">SEND ETHER</button>
+    <input type="number" name="sendEther" id="sendEther">
+
+    <script>
+        let account;
+        const connectMetamask = async () => {
+            if(window.ethereum !== "undefined") {
+                const accounts = await ethereum.request({method: "eth_requestAccounts"});
+                account = accounts[0];
+                document.getElementById("accountArea").innerHTML = account;
+            }
+        }
+        const connectContract = async () => {
+            const ABI = [
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address payable",
+                            "name": "_to",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "deposit",
+                    "outputs": [],
+                    "stateMutability": "payable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [
+                        {
+                            "internalType": "address payable",
+                            "name": "_to",
+                            "type": "address"
+                        }
+                    ],
+                    "name": "deposit2",
+                    "outputs": [],
+                    "stateMutability": "payable",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "deposit3",
+                    "outputs": [],
+                    "stateMutability": "payable",
+                    "type": "function"
+                },
+                {
+                    "stateMutability": "payable",
+                    "type": "fallback"
+                },
+                {
+                    "stateMutability": "payable",
+                    "type": "receive"
+                },
+                {
+                    "inputs": [],
+                    "name": "getAddress",
+                    "outputs": [
+                        {
+                            "internalType": "address",
+                            "name": "",
+                            "type": "address"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "getBalance",
+                    "outputs": [
+                        {
+                            "internalType": "uint256",
+                            "name": "",
+                            "type": "uint256"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "inputs": [],
+                    "name": "myWord",
+                    "outputs": [
+                        {
+                            "internalType": "string",
+                            "name": "",
+                            "type": "string"
+                        }
+                    ],
+                    "stateMutability": "view",
+                    "type": "function"
+                }
+            ];
+            const Address = "0xfdb6f6Fb208f50F6F21A8c37C1204515ea9b7Dc7";
+            window.web3 = await new Web3(window.ethereum);
+            window.contract = await new window.web3.eth.Contract(ABI, Address);
+            document.getElementById("contractArea").innerHTML = "Contract Connection: True";
+        }
+
+        const readFromContract = async () => {
+            const data = await window.contract.methods.myWord().call();
+            document.getElementById("dataArea").innerHTML = `Word from Contract: ${data}`;
+        }
+
+        const getBalanceContract = async () => {
+            const data = await window.contract.methods.getBalance().call();
+            document.getElementById("balanceArea").innerHTML = `Balance of the Contract: ${data}`;
+        }
+
+        const sendEther = async () => {
+            await window.contract.methods.deposit3().send({ from: account, value: 50005 })
+        }
+
+    </script>
+</body>
+</html>
