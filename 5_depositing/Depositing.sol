@@ -8,11 +8,11 @@ contract Deposit3 {
         return address(this);
     }
 
-    //Address --> Contract deposit
+    //Address --> Contract transfer
     function deposit() external payable {
     }
 
-    //Contract --> Address
+    //Contract --> Address transfer
     function withdraw(address payable _to, uint _amount) external {
         _to.transfer(_amount);
     }

@@ -24,8 +24,11 @@
             font-family: tahoma;
             outline: none;
         }
-        div {
-            flex-grow: 1;
+        #readArea {
+            flex-basis: 50%;
+        }
+        #writeArea {
+            flex-basis: 50%;
         }
         button:hover {
             background-color: yellow;
@@ -40,39 +43,108 @@
         <p id="userArea">Status: Not connected to Metamask</p>
         <button onclick="connectContract()">CONNECT TO CONTRACT</button>
         <p id="contractArea">Status: Not connected to Contract</p>
-        <button onclick="getUserAccount()"> GET USER ACCOUNT </button>
-        <p id="userAccount">User Account: Not Connected to Contract</p>
+        <button onclick="getContractAccount()"> GET CONTRACT ACCOUNT </button>
+        <p id="userAccount">Contract Account: Not Connected to Contract</p>
         <button onclick="getBalance()">GET BALANCE OF THE CONTRACT</button>
-        <p>Balance: Not Connected to Contract</p>
+        <p id="balanceArea">Balance: Not Connected to Contract</p>
     </div>
     <div id="writeArea">
-        <button>Send ether to the Contract</button><br>
+        <button onclick="depositContract()">Send ether to the Contract</button><br>
         <input type="number" id="depositInput" placeholder="Enter Amount"><br> <br>
 
-        <button>WITHDRAW ETHER TO ANY ADDRESS</button> <br>
-        <input type="text" id="withdrawInput2address" placeholder="Enter Address"> <br>
-        <input type="number" id="withdrawInput2amount" placeholder="Enter Amount"> 
+        <button onclick="withdraw()">WITHDRAW ETHER TO ANY ADDRESS</button> <br>
+        <input type="text" id="addressInput2" placeholder="Enter Address"> <br>
+        <input type="number" id="amountInput2" placeholder="Enter Amount"> 
     </div>
 
     <script>
         let account;
         const connectMetamask = async () => {
-            if(window.ethereum !== "") {
-                const accounts = await ethereum.request({method: "eht_requestAccounts"});
+            if(window.ethereum !== "undefined") {
+                const accounts = await ethereum.request({method: "eth_requestAccounts"});
                 account = accounts[0];
-                document.getElementById("userArea").innerHTML = `Connected to Metamask. User Account: ${account} `;
+                document.getElementById("userArea").innerHTML = `User Account: ${account} `;
             }
         }
+        
         const connectContract = async () => {
-            const ABI = ;
-            const Address = "";
+            const ABI = [
+        {
+            "inputs": [],
+            "name": "deposit",
+            "outputs": [],
+            "stateMutability": "payable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address payable",
+                    "name": "_to",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "_amount",
+                    "type": "uint256"
+                }
+            ],
+            "name": "withdraw",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "getAddress",
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "getBalance",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        }
+    ];
+            const Address = "0xE893605781E5C803ace60685E8f57A23f4a6DD91";
             window.web3 = await new Web3(window.ethereum);
             window.contract = await new window.web3.eth.Contract(ABI, Address);
             document.getElementById("contractArea").innerHTML = "Connected to Contract";
         }
-        const getUserAccount = async () => {
-            const userAccount = await window.contract.methods.getAddress().call();
-            document.getElementById("userAccount").innerHTML = `User Account: ${userAccount}`;
+        const getContractAccount = async () => {
+            const contractAccount = await window.contract.methods.getAddress().call();
+            document.getElementById("userAccount").innerHTML = `Contract Account: ${contractAccount}`;
+        }
+
+        const getBalance = async () => {
+            const accountBalance = await window.contract.methods.getBalance().call();
+            document.getElementById("balanceArea").innerHTML = `Contract Balance: ${accountBalance}`; 
+        }
+
+        const depositContract = async () => {
+            const amount = document.getElementById("depositInput").value;
+            await window.contract.methods.deposit().send({from: account, value: amount});
+        }
+
+        const withdraw = async () => {
+            const address = document.getElementById("addressInput2").value;
+            const amount = document.getElementById("amountInput2").value;
+            await window.contract.methods.withdraw(address, amount).send({from: account});
         }
 
     </script>
