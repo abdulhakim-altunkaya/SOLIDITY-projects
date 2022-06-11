@@ -2,11 +2,14 @@
 <html>
 <head>
     <title>ETHER TRANSACTION DAPP</title>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.2.7-rc.0/web3.min.js"></script>
     <style>
         body {
             background-color: palevioletred;
             font-family: tahoma;
             font-size: 33px;
+            display: flex;
+            flex-direction: row;
         }
         button {
             background-color: aquamarine;
@@ -21,21 +24,58 @@
             font-family: tahoma;
             outline: none;
         }
+        div {
+            flex-grow: 1;
+        }
+        button:hover {
+            background-color: yellow;
+        }
+
     </style>
 </head>
 <body>
-    <button>CONNECT TO METAMASK</button>
-    <p>Status: Not connected to Metamask</p>
-    <button>CONNECT TO CONTRACT</button>
-    <p>Status: Not connected to Contract</p>
-    <button>GET BALANCE OF THE CONTRACT</button>
-    <p>Balance: Not Connected to Contract</p>
-    <button>Send ether to the Contract</button><br>
-    <input type="text" id="depositInput" placeholder="Enter Amount"><br> <br>
-    <button>WITHDRAW ETHER TO ANY ADDRESS 1</button> <br>
-    <input type="text" id="withdrawInput" placeholder="Enter Address"> <br><br>
-    <button>WITHDRAW ETHER TO ANY ADDRESS 2</button> <br>
-    <input type="text" id="withdrawInput2address" placeholder="Enter Address"> <br>
-    <input type="text" id="withdrawInput2amount" placeholder="Enter Amount"> 
+
+    <div id="readArea">
+        <button onclick="connectMetamask()">CONNECT TO METAMASK</button>
+        <p id="userArea">Status: Not connected to Metamask</p>
+        <button onclick="connectContract()">CONNECT TO CONTRACT</button>
+        <p id="contractArea">Status: Not connected to Contract</p>
+        <button onclick="getUserAccount()"> GET USER ACCOUNT </button>
+        <p id="userAccount">User Account: Not Connected to Contract</p>
+        <button onclick="getBalance()">GET BALANCE OF THE CONTRACT</button>
+        <p>Balance: Not Connected to Contract</p>
+    </div>
+    <div id="writeArea">
+        <button>Send ether to the Contract</button><br>
+        <input type="number" id="depositInput" placeholder="Enter Amount"><br> <br>
+
+        <button>WITHDRAW ETHER TO ANY ADDRESS</button> <br>
+        <input type="text" id="withdrawInput2address" placeholder="Enter Address"> <br>
+        <input type="number" id="withdrawInput2amount" placeholder="Enter Amount"> 
+    </div>
+
+    <script>
+        let account;
+        const connectMetamask = async () => {
+            if(window.ethereum !== "") {
+                const accounts = await ethereum.request({method: "eht_requestAccounts"});
+                account = accounts[0];
+                document.getElementById("userArea").innerHTML = `Connected to Metamask. User Account: ${account} `;
+            }
+        }
+        const connectContract = async () => {
+            const ABI = ;
+            const Address = "";
+            window.web3 = await new Web3(window.ethereum);
+            window.contract = await new window.web3.eth.Contract(ABI, Address);
+            document.getElementById("contractArea").innerHTML = "Connected to Contract";
+        }
+        const getUserAccount = async () => {
+            const userAccount = await window.contract.methods.getAddress().call();
+            document.getElementById("userAccount").innerHTML = `User Account: ${userAccount}`;
+        }
+
+    </script>
+   
 </body>
 </html>
